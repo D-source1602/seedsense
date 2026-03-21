@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Crop Recommendations - SeedSense</title>
+    <link rel="stylesheet" href="Demo.css">
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+   
+</head>
+<body class="recommendations-page-body">
+
+    <main class="reco-layout-redesigned">
+        <section class="reco-main-content">
+            <div id="crop-details-placeholder">
+                <h2>Welcome to SeedSense AI</h2>
+                <p>Your personalized crop recommendations are loading. Please wait a moment...</p>
+                <div class="spinner"></div>
+            </div>
+
+            <div id="crop-details-content" style="display: none;">
+                <img id="detail-image" src="" alt="Image of a crop">
+                <h1 id="detail-name"></h1>
+                
+                <div class="detail-cards-container">
+                    <div class="detail-card">
+                        <h3>Harvest Time</h3>
+                        <p id="detail-harvest"></p>
+                    </div>
+                    <div class="detail-card">
+                        <h3>Local Mandi Price</h3>
+                        <p id="detail-price"></p>
+                    </div>
+                </div>
+
+                <h2>Cultivation Procedure</h2>
+                <ol id="detail-steps"></ol>
+            </div>
+        </section>
+
+        <aside class="reco-sidebar-redesigned">
+            <div class="reco-header">
+                <a href="dashboard.html" class="back-link">← Change Location</a>
+                <h2>Analysis for <span id="location-name">...</span></h2>
+            </div>
+
+            <div class="info-card" id="weather-card">
+                <h3>Current Weather</h3>
+                <div id="weather-info"><p>Fetching...</p></div>
+            </div>
+
+            <div class="info-card" id="soil-card">
+                <h3>Soil Profile</h3>
+                <div id="soil-info"><p>Analyzing...</p></div>
+            </div>
+
+            <div class="info-card" id="crops-card">
+                <h3>Top 5 Recommendations</h3>
+                <div id="crop-list">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="red.js"></script>
+    <script src="chatbot (6).js"></script>
+     <script src="SeedSense_assistant.js"></script>
+       <script>
+        window.botpress.init({
+            botId: "fd4bdc02-2327-4cd5-8030-e68296f8fdca",
+            clientId: "5d30e133-1186-4cc4-96bc-7b07c1484a35",
+            configuration: {
+                version: "v2",
+                composerPlaceholder: "Type a message...",
+                botName: "SeedSense Customer Support",
+                botAvatar: "https://files.bpcontent.cloud/2025/09/19/20/20250919200651-G527MP7W.jpeg",
+                botDescription: "I can help you with questions about SeedSense's features, plans and how to get the most from your SeedSense experience.",
+                fabImage: "https://files.bpcontent.cloud/2026/03/21/08/20260321084925-B4DDCUUP.png",
+                website: {
+                    title: "Website",
+                    link: "https://gemini.google.com/"
+                },
+                color: "#436f1f",
+                variant: "solid",
+                headerVariant: "solid",
+                themeMode: "light",
+                fontFamily: "inter",
+                radius: 2,
+                feedbackEnabled: true,
+                footer: "[⚡ by Botpress](https://botpress.com/?from=webchat)",
+                allowFileUpload: true,
+                soundEnabled: true,
+                proactiveMessageEnabled: false,
+                conversationHistory: false
+            }
+        });
+    </script>
+    <script src="translator.js"></script>
+    
+</body>
+</html>

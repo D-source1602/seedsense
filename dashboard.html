@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeedSense Dashboard</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="Demo.css">
+
+    <!-- ✅ ADD THIS STYLE BLOCK -->
+    <style>
+        .map-view {
+            position: relative !important;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            border-radius: 0;
+        }
+
+        .risk-box {
+            position: absolute !important;
+            bottom: 30px !important;
+            left: 20px !important;
+            z-index: 9999 !important;
+            width: 380px;
+            background: #f4f6f8;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+            padding: 14px 16px;
+            font-family: 'Poppins', sans-serif;
+            border: 1px solid #e2e6ea;
+        }
+
+        .risk-box.hidden { display: none !important; }
+
+        .risk-box-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .risk-brand {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .risk-brand-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2E8B57;
+        }
+
+        .risk-location {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #555;
+            background: #fff;
+            padding: 3px 9px;
+            border-radius: 20px;
+            border: 1px solid #dde;
+        }
+
+        .risk-title-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .risk-title {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .risk-subtitle {
+            font-size: 11px;
+            color: #888;
+            margin: 0 0 10px 0;
+        }
+
+        .risk-loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #666;
+            padding: 6px 0;
+        }
+
+        .risk-loading.hidden { display: none; }
+
+        .risk-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #ddd;
+            border-top-color: #2E8B57;
+            border-radius: 50%;
+            animation: riskSpin 0.8s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes riskSpin { to { transform: rotate(360deg); } }
+
+        .risk-cards-row {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .risk-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px 12px;
+            flex: 1;
+            border: 1.5px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .drought-card { border-color: #c8e6c9; }
+        .flood-card   { border-color: #b3d9f5; }
+
+        .risk-card-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .risk-card-value {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .drought-card .risk-card-value { color: #2E8B57; }
+        .flood-card   .risk-card-value { color: #0077b6; }
+
+        .risk-card-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .risk-card-bar {
+            height: 100%;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.8s ease;
+        }
+
+        .drought-bar { background: linear-gradient(90deg, #94c83d, #2E8B57); }
+        .flood-bar   { background: linear-gradient(90deg, #90e0ef, #0077b6); }
+
+        .risk-overall-card {
+            background: #e9ecef;
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            font-size: 11px;
+            color: #555;
+            font-weight: 500;
+            min-width: 90px;
+            gap: 4px;
+            border: 1.5px solid #dde;
+        }
+
+        .risk-overall-card strong {
+            font-size: 14px;
+            font-weight: 800;
+            display: block;
+        }
+
+        .risk-overall-card.low    strong { color: #155724; }
+        .risk-overall-card.medium strong { color: #856404; }
+        .risk-overall-card.high   strong { color: #721c24; }
+        .risk-overall-card.severe strong { color: #491217; }
+
+        .risk-reason-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px 10px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .risk-info-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+        .risk-reason-text {
+            margin: 0;
+            font-size: 10.5px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        #risk-content.hidden { display: none; }
+    </style>
+</head>
+<body class="dashboard-page-body">
+
+    <main class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>SeedSense</h1>
+                <p>Climate Explorer</p>
+            </div>
+
+            <button id="getLocationBtn">📍 Get My Current Location</button>
+
+            <div class="state-list-container">
+                <h2>Indian States & UTs</h2>
+                <ul id="state-list">
+                    <li data-lat="11.62" data-lon="92.72">Andaman & Nicobar</li>
+                    <li data-lat="16.57" data-lon="80.35">Andhra Pradesh</li>
+                    <li data-lat="27.09" data-lon="93.60">Arunachal Pradesh</li>
+                    <li data-lat="26.14" data-lon="91.77">Assam</li>
+                    <li data-lat="25.59" data-lon="85.13">Bihar</li>
+                    <li data-lat="30.73" data-lon="76.77">Chandigarh</li>
+                    <li data-lat="21.25" data-lon="81.62">Chhattisgarh</li>
+                    <li data-lat="20.42" data-lon="72.83">Daman & Diu</li>
+                    <li data-lat="28.61" data-lon="77.20">Delhi</li>
+                    <li data-lat="15.49" data-lon="73.82">Goa</li>
+                    <li data-lat="23.21" data-lon="72.63">Gujarat</li>
+                    <li data-lat="29.05" data-lon="76.08">Haryana</li>
+                    <li data-lat="31.10" data-lon="77.17">Himachal Pradesh</li>
+                    <li data-lat="34.08" data-lon="74.79">Jammu and Kashmir</li>
+                    <li data-lat="23.34" data-lon="85.30">Jharkhand</li>
+                    <li data-lat="12.97" data-lon="77.59">Karnataka</li>
+                    <li data-lat="8.52" data-lon="76.93">Kerala</li>
+                    <li data-lat="34.15" data-lon="77.57">Ladakh</li>
+                    <li data-lat="10.56" data-lon="72.64">Lakshadweep</li>
+                    <li data-lat="23.25" data-lon="77.41">Madhya Pradesh</li>
+                    <li data-lat="19.07" data-lon="72.87">Maharashtra</li>
+                    <li data-lat="24.81" data-lon="93.93">Manipur</li>
+                    <li data-lat="25.57" data-lon="91.89">Meghalaya</li>
+                    <li data-lat="23.73" data-lon="92.71">Mizoram</li>
+                    <li data-lat="25.67" data-lon="94.10">Nagaland</li>
+                    <li data-lat="20.29" data-lon="85.82">Odisha</li>
+                    <li data-lat="11.94" data-lon="79.80">Puducherry</li>
+                    <li data-lat="31.14" data-lon="75.34">Punjab</li>
+                    <li data-lat="26.91" data-lon="75.78">Rajasthan</li>
+                    <li data-lat="27.33" data-lon="88.61">Sikkim</li>
+                    <li data-lat="13.08" data-lon="80.27">Tamil Nadu</li>
+                    <li data-lat="17.38" data-lon="78.48">Telangana</li>
+                    <li data-lat="23.83" data-lon="91.28">Tripura</li>
+                    <li data-lat="30.31" data-lon="78.03">Uttarakhand</li>
+                    <li data-lat="26.84" data-lon="80.94">Uttar Pradesh</li>
+                    <li data-lat="22.57" data-lon="88.36">West Bengal</li>
+                </ul>
+            </div>
+            
+            <button id="confirmLocationBtn" class="confirm-btn">Confirm & Continue →</button>
+
+        </aside>
+
+       <section class="map-view">
+            <div id="map"></div>
+
+            <!-- AI Climate Risk Box -->
+            <div id="risk-index-box" class="risk-box hidden">
+                <div class="risk-box-header">
+                    <span>🌿</span>
+                    <h4>Climate Risk Index</h4>
+                    <span class="risk-powered">SeedSense AI</span>
+                </div>
+                <div class="risk-box-body">
+                    <div class="risk-region" id="risk-region-name">Select a region</div>
+
+                    <div id="risk-loading" class="risk-loading hidden">
+                        <div class="risk-spinner"></div>
+                        <span>Analyzing climate data...</span>
+                    </div>
+
+                    <div id="risk-content" class="hidden">
+                        <div class="risk-row">
+                            <span class="risk-label">🌵 Drought</span>
+                            <div class="risk-bar-wrap">
+                                <div class="risk-bar drought-bar" id="drought-bar"></div>
+                            </div>
+                            <span class="risk-value" id="drought-value">--</span>
+                        </div>
+                        <div class="risk-row">
+                            <span class="risk-label">🌊 Flood</span>
+                            <div class="risk-bar-wrap">
+                                <div class="risk-bar flood-bar" id="flood-bar"></div>
+                            </div>
+                            <span class="risk-value" id="flood-value">--</span>
+                        </div>
+                        <div class="risk-overall" id="risk-overall-label">Overall: --</div>
+                        <div class="risk-reason" id="risk-reason"></div>
+                        <div class="risk-advice" id="risk-advice"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="chatbot (6).js"></script>
+     <script src="SeedSense_assistant.js"></script>
+       <script>
+        window.botpress.init({
+            botId: "fd4bdc02-2327-4cd5-8030-e68296f8fdca",
+            clientId: "5d30e133-1186-4cc4-96bc-7b07c1484a35",
+            configuration: {
+                version: "v2",
+                composerPlaceholder: "Type a message...",
+                botName: "SeedSense Customer Support",
+                botAvatar: "https://files.bpcontent.cloud/2025/09/19/20/20250919200651-G527MP7W.jpeg",
+                botDescription: "I can help you with questions about SeedSense's features, plans and how to get the most from your SeedSense experience.",
+                fabImage: "https://files.bpcontent.cloud/2026/03/21/08/20260321084925-B4DDCUUP.png",
+                website: {
+                    title: "Website",
+                    link: "https://gemini.google.com/"
+                },
+                color: "#436f1f",
+                variant: "solid",
+                headerVariant: "solid",
+                themeMode: "light",
+                fontFamily: "inter",
+                radius: 2,
+                feedbackEnabled: true,
+                footer: "[⚡ by Botpress](https://botpress.com/?from=webchat)",
+                allowFileUpload: true,
+                soundEnabled: true,
+                proactiveMessageEnabled: false,
+                conversationHistory: false
+            }
+        });
+    </script>
+   <script src="translator.js"></script>
+   
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to SeedSense</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="Demo.css">
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- ✅ Botpress Script -->
+    <script src="https://cdn.botpress.cloud/webchat/v2/inject.js"></script>
+
+    <!-- ✅ Position chatbot beside green button -->
+    <style>
+        .bpFab {
+            right: 90px !important;
+            left: auto !important;
+            bottom: 20px !important;
+        }
+
+        .bpWebchat {
+            right: 90px !important;
+            left: auto !important;
+            bottom: 80px !important;
+        }
+    </style>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+   
+</head>
+
+<body>
+
+    <main class="container">
+        
+        <div class="info-panel">
+            <h1>GROW SMARTER <br> HARVEST MORE <br> PROFIT</h1>
+            <p>Unlock your land's potential</p>
+        </div>
+
+        <div class="form-panel">
+            <div class="logo-container">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTRjODNkIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIyIDExLjA4VjEyYTggOCAwIDEgMS01LjkyLTcuNzQiLz48cGF0aCBkPSJNMjIgNGwtMTAgMTAtNC00Ii8+PC9zdmc+" alt="SeedSense Logo">
+                <span>SeedSense</span>
+            </div>
+
+            <h2>Welcome to SeedSense</h2>
+            <p class="subtitle">AI-powered crop recommendations</p>
+
+            <form id="signup-form">
+                <div class="form-group">
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+
+                <div class="options-group">
+                    <label>
+                        <input type="checkbox"> Remember for 30 days
+                    </label>
+                    <a href="#">Forgot Password</a>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span>Sign Up</span>
+                    <span class="arrow-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </span>
+                </button>
+            </form>
+
+            <p class="login-link">Already have an account? <a href="#">Login</a></p>
+            
+            <div class="separator">or</div>
+            
+            <div class="google-btn-container">
+                <div id="g_id_onload"
+                     data-client_id="601281173121-33oecc3bbulc9uhr83dn7itlmv0jilh1.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="Demo.js"></script>
+
+    <!-- ✅ NEW CHATBOT -->
+    <script>
+        window.botpress.init({
+            botId: "fd4bdc02-2327-4cd5-8030-e68296f8fdca",
+            clientId: "5d30e133-1186-4cc4-96bc-7b07c1484a35",
+            configuration: {
+                version: "v2",
+                composerPlaceholder: "Type a message...",
+                botName: "SeedSense Customer Support",
+                botAvatar: "https://files.bpcontent.cloud/2025/09/19/20/20250919200651-G527MP7W.jpeg",
+                botDescription: "I can help you with questions about SeedSense's features, plans and how to get the most from your SeedSense experience.",
+                fabImage: "https://files.bpcontent.cloud/2026/03/21/08/20260321084925-B4DDCUUP.png",
+                website: {
+                    title: "Website",
+                    link: "https://gemini.google.com/"
+                },
+                color: "#436f1f",
+                variant: "solid",
+                headerVariant: "solid",
+                themeMode: "light",
+                fontFamily: "inter",
+                radius: 2,
+                feedbackEnabled: true,
+                footer: "[⚡ by Botpress](https://botpress.com/?from=webchat)",
+                allowFileUpload: true,
+                soundEnabled: true,
+                proactiveMessageEnabled: false,
+                conversationHistory: false
+            }
+        });
+    </script>
+   <script src="translator.js"></script>
+   
+
+</body>
+</html>
