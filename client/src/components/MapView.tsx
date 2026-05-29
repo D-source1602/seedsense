@@ -4,31 +4,58 @@ import L from 'leaflet';
 
 import type { LocationSelection } from '../types';
 
-/* Fix default Leaflet icons (Vite + bundlers) */
-const defaultIcon = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl:
-    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+/**
+ * Custom glowing pin SVG for the dark theme.
+ */
+const glowPin = L.divIcon({
+  className: '',
+  html: `
+    <div style="position:relative; width:36px; height:48px;">
+      <div style="
+        position:absolute; inset:0;
+        background: radial-gradient(circle, rgba(163,230,53,0.65) 0%, rgba(163,230,53,0) 65%);
+        filter: blur(6px);
+        animation: pulse 2.4s ease-in-out infinite;
+      "></div>
+      <svg viewBox="0 0 36 48" width="36" height="48" style="position:relative;">
+        <defs>
+          <linearGradient id="pinG" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#a3e635"/>
+            <stop offset="100%" stop-color="#22a04a"/>
+          </linearGradient>
+        </defs>
+        <path d="M18 0C8 0 0 8 0 18c0 13 18 30 18 30s18-17 18-30c0-10-8-18-18-18z"
+              fill="url(#pinG)"
+              stroke="#0a2e19"
+              stroke-width="1.5"
+              filter="drop-shadow(0 4px 8px rgba(0,0,0,0.4))" />
+        <circle cx="18" cy="18" r="6" fill="#06180e" />
+        <circle cx="18" cy="18" r="3" fill="#a3e635" />
+      </svg>
+    </div>
+    <style>
+      @keyframes pulse {
+        0%, 100% { opacity: 0.5; transform: scale(1); }
+        50%      { opacity: 1;   transform: scale(1.25); }
+      }
+    </style>
+  `,
+  iconSize: [36, 48],
+  iconAnchor: [18, 48],
+  popupAnchor: [0, -42],
 });
-L.Marker.prototype.options.icon = defaultIcon;
 
 type Props = {
   selection: LocationSelection | null;
   zoom?: number;
 };
 
-/** Animates the map view to the new selection. */
 function FlyTo({ selection, zoom = 7 }: Props) {
   const map = useMap();
   useEffect(() => {
     if (selection) {
       map.flyTo([selection.lat, selection.lon], zoom, {
-        duration: 1.0,
+        duration: 1.1,
         easeLinearity: 0.25,
       });
     }
@@ -42,6 +69,7 @@ export default function MapView({ selection, zoom = 7 }: Props) {
       center={[20.5937, 78.9629]}
       zoom={5}
       scrollWheelZoom
+      zoomControl={false}
       className="h-full w-full"
     >
       <TileLayer
@@ -50,7 +78,7 @@ export default function MapView({ selection, zoom = 7 }: Props) {
       />
       <FlyTo selection={selection} zoom={zoom} />
       {selection && (
-        <Marker position={[selection.lat, selection.lon]}>
+        <Marker position={[selection.lat, selection.lon]} icon={glowPin}>
           <Popup>
             <strong>{selection.name}</strong>
           </Popup>

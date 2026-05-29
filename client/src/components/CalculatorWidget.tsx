@@ -22,16 +22,11 @@ import {
 
 type Tab = 'ph' | 'water' | 'seed';
 
-/* ════════════════════════════════════════════════════════
-   FLOATING CALCULATOR WIDGET
-   3 tabs: pH · Irrigation · Seed Rate
-   ════════════════════════════════════════════════════════ */
 export default function CalculatorWidget() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>('ph');
   const [showHint, setShowHint] = useState(false);
 
-  // pulse the FAB once after a few seconds (parity with original notif dot)
   useEffect(() => {
     const t = setTimeout(() => setShowHint(true), 2500);
     return () => clearTimeout(t);
@@ -39,16 +34,19 @@ export default function CalculatorWidget() {
 
   return (
     <>
-      {/* ── Floating Action Button ── */}
+      {/* Floating Action Button */}
       <motion.button
         onClick={() => {
           setOpen((v) => !v);
           setShowHint(false);
         }}
-        whileHover={{ scale: 1.08, y: -2 }}
+        whileHover={{ scale: 1.1, y: -3 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Open SeedSense farm calculator"
-        className="fixed bottom-6 right-6 z-[2147483647] grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-leaf-500 to-leaf-700 text-white shadow-leaf"
+        className="pulse-glow fixed bottom-6 right-6 z-[2147483647] grid h-14 w-14 place-items-center rounded-full text-leaf-950 shadow-glow-lg"
+        style={{
+          background: 'linear-gradient(135deg, #a3e635 0%, #46c468 50%, #22a04a 100%)',
+        }}
       >
         <AnimatePresence mode="wait">
           {open ? (
@@ -74,46 +72,48 @@ export default function CalculatorWidget() {
           )}
         </AnimatePresence>
         {showHint && !open && (
-          <span className="absolute right-0 top-0 h-3 w-3 rounded-full border-2 border-white bg-rose-500 animate-pulse" />
+          <span className="absolute right-0 top-0 h-3 w-3 rounded-full border-2 border-leaf-950 bg-saffron-500 shadow-glow-amber animate-pulse" />
         )}
       </motion.button>
 
-      {/* ── Panel ── */}
+      {/* Panel */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 18, scale: 0.92 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 18, scale: 0.92 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-24 right-6 z-[2147483646] flex max-h-[calc(100vh-7rem)] w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-cream shadow-2xl ring-1 ring-leaf-200"
+            initial={{ opacity: 0, y: 24, scale: 0.9, rotateX: -10 }}
+            animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+            exit={{ opacity: 0, y: 24, scale: 0.9, rotateX: -10 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed bottom-24 right-6 z-[2147483646] flex max-h-[calc(100vh-7rem)] w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl shadow-3d-lift ring-1 ring-lime-400/25 perspective-1500 border-glow"
+            style={{ background: 'rgba(7, 15, 8, 0.95)', backdropFilter: 'blur(24px)' }}
           >
             {/* Header */}
-            <header className="relative overflow-hidden bg-gradient-to-br from-leaf-700 via-leaf-800 to-leaf-900 p-4 text-white">
-              <div className="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full bg-wheat-300/20 blur-2xl" />
+            <header className="relative overflow-hidden bg-gradient-to-br from-moss-900 via-leaf-900 to-moss-950 p-4 text-leaf-50">
+              <div className="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full bg-lime-400/25 blur-3xl animate-orbDrift" />
+              <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-saffron-500/15 blur-3xl" />
               <div className="relative flex items-center gap-3">
-                <div className="grid h-11 w-11 place-items-center rounded-xl bg-leaf-300/20 ring-2 ring-white/15 backdrop-blur">
-                  <Sparkles className="text-wheat-300" size={20} />
+                <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-lime-400 to-leaf-700 text-leaf-950 ring-2 ring-lime-400/30 shadow-glow">
+                  <Sparkles size={20} />
                 </div>
                 <div className="flex-1">
                   <div className="font-display text-lg font-bold leading-none">
                     SeedSenseCalc
                   </div>
-                  <div className="mt-1 flex items-center gap-1.5 text-[11px] text-leaf-100/80">
-                    <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+                  <div className="mt-1 flex items-center gap-1.5 text-[11px] text-leaf-100/70">
+                    <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-lime-400 shadow-glow" />
                     Indian Farm Calculator
                   </div>
                 </div>
               </div>
               <div className="relative mt-3 flex flex-wrap gap-1">
-                <span className="pill bg-white/10 text-white">🇮🇳 India Data</span>
-                <span className="pill bg-white/10 text-white">🧮 3 Calculators</span>
-                <span className="pill bg-white/10 text-white">⚡ Free</span>
+                <span className="pill">🇮🇳 India Data</span>
+                <span className="pill">🧮 3 Calculators</span>
+                <span className="pill">⚡ Free</span>
               </div>
             </header>
 
             {/* Tab bar */}
-            <nav className="flex border-b border-leaf-100 bg-white">
+            <nav className="flex border-b border-leaf-500/15 bg-moss-950/80">
               <TabBtn active={tab === 'ph'} onClick={() => setTab('ph')}>
                 <FlaskConical size={14} /> pH Fixer
               </TabBtn>
@@ -125,8 +125,7 @@ export default function CalculatorWidget() {
               </TabBtn>
             </nav>
 
-            {/* Panel body */}
-            <div className="thin-scroll flex-1 overflow-y-auto p-4">
+            <div className="thin-scroll flex-1 overflow-y-auto p-4 bg-moss-950/60">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={tab}
@@ -142,7 +141,7 @@ export default function CalculatorWidget() {
               </AnimatePresence>
             </div>
 
-            <footer className="border-t border-leaf-100 bg-white py-2 text-center text-[10px] text-leaf-700/50">
+            <footer className="border-t border-leaf-500/10 bg-moss-950/80 py-2 text-center text-[10px] text-leaf-100/40">
               SeedSenseCalc · Made for Indian Farmers
             </footer>
           </motion.div>
@@ -152,7 +151,6 @@ export default function CalculatorWidget() {
   );
 }
 
-/* ─── Reusable building blocks ─────────────────────────── */
 function TabBtn({
   active,
   onClick,
@@ -165,13 +163,17 @@ function TabBtn({
   return (
     <button
       onClick={onClick}
-      className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-3 text-xs font-semibold transition-all ${
-        active
-          ? 'border-b-2 border-leaf-600 text-leaf-700'
-          : 'border-b-2 border-transparent text-leaf-700/50 hover:text-leaf-700'
+      className={`relative flex flex-1 items-center justify-center gap-1.5 px-3 py-3 text-xs font-semibold transition-all ${
+        active ? 'text-lime-400' : 'text-leaf-100/40 hover:text-leaf-100/80'
       }`}
     >
       {children}
+      {active && (
+        <motion.span
+          layoutId="calcTabUnderline"
+          className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-gradient-to-r from-lime-400 to-leaf-300 shadow-glow"
+        />
+      )}
     </button>
   );
 }
@@ -186,8 +188,8 @@ function CardShell({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-leaf-100 bg-white p-4 shadow-sm">
-      <h3 className="mb-3 flex items-center gap-2 border-b border-leaf-100 pb-2 text-sm font-bold text-leaf-700">
+    <section className="rounded-xl border border-leaf-500/15 bg-moss-900/60 p-4 backdrop-blur">
+      <h3 className="mb-3 flex items-center gap-2 border-b border-leaf-500/15 pb-2 text-sm font-bold text-lime-400">
         {icon} {title}
       </h3>
       <div className="space-y-3">{children}</div>
@@ -195,25 +197,17 @@ function CardShell({
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-[11px] font-medium text-leaf-700/70">
-        {label}
-      </span>
+      <span className="mb-1 block text-[11px] font-medium text-leaf-100/60">{label}</span>
       {children}
     </label>
   );
 }
 
 const inputClass =
-  'w-full rounded-lg border border-leaf-200 bg-leaf-50/40 px-3 py-2 text-sm text-leaf-900 outline-none transition focus:border-leaf-400 focus:ring-2 focus:ring-leaf-300/40';
+  'w-full rounded-lg border border-leaf-500/20 bg-moss-950/60 px-3 py-2 text-sm text-leaf-50 outline-none transition focus:border-lime-400/60 focus:ring-2 focus:ring-lime-400/30';
 
 function Select({
   value,
@@ -230,12 +224,13 @@ function Select({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`${inputClass} appearance-none pr-9`}
+        style={{ colorScheme: 'dark' }}
       >
         {children}
       </select>
       <ChevronDown
         size={14}
-        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-leaf-700/60"
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-leaf-100/50"
       />
     </div>
   );
@@ -255,20 +250,23 @@ function ResultBox({
   if (!show) return null;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-leaf-100/60 p-3"
+      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.35 }}
+      className="relative overflow-hidden rounded-xl border border-lime-400/40 bg-gradient-to-br from-leaf-500/15 via-moss-900/80 to-moss-950 p-3 shadow-glow"
     >
-      <div className="mb-1 text-[11px] font-semibold text-leaf-700">📊 {title}</div>
-      <div className="font-display text-lg font-bold leading-tight text-leaf-800">
-        {value}
+      <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-lime-400/25 blur-2xl" />
+      <div className="relative">
+        <div className="mb-1 text-[11px] font-semibold text-lime-400">📊 {title}</div>
+        <div className="font-display text-lg font-bold leading-tight text-leaf-50">
+          {value}
+        </div>
+        {detail && (
+          <pre className="mt-2 whitespace-pre-line border-t border-lime-400/20 pt-2 text-[11.5px] leading-relaxed text-leaf-100/85">
+            {detail}
+          </pre>
+        )}
       </div>
-      {detail && (
-        <pre className="mt-2 whitespace-pre-line border-t border-emerald-200/60 pt-2 text-[11.5px] leading-relaxed text-leaf-900/85">
-          {detail}
-        </pre>
-      )}
     </motion.div>
   );
 }
@@ -284,16 +282,14 @@ function CalcButton({
     <motion.button
       onClick={onClick}
       whileTap={{ scale: 0.98 }}
-      className="mt-1 w-full rounded-lg bg-gradient-to-br from-leaf-500 to-leaf-700 py-2.5 text-sm font-bold text-white shadow-md transition hover:shadow-lg"
+      whileHover={{ y: -1 }}
+      className="btn-primary mt-1 w-full py-2.5 text-sm"
     >
       {children}
     </motion.button>
   );
 }
 
-/* ════════════════════════════════════════════════════════
-   pH PANEL
-   ════════════════════════════════════════════════════════ */
 function PhPanel() {
   const [cur, setCur] = useState('');
   const [crop, setCrop] = useState('');
@@ -337,18 +333,8 @@ function PhPanel() {
   return (
     <CardShell title="Soil pH Correction" icon="🧪">
       <Field label="Current Soil pH">
-        <input
-          type="number"
-          value={cur}
-          step="0.1"
-          min="3"
-          max="10"
-          placeholder="e.g. 5.2"
-          onChange={(e) => setCur(e.target.value)}
-          className={inputClass}
-        />
+        <input type="number" value={cur} step="0.1" min="3" max="10" placeholder="e.g. 5.2" onChange={(e) => setCur(e.target.value)} className={inputClass} />
       </Field>
-
       <Field label="Crop to Grow">
         <Select value={crop} onChange={setCrop}>
           <option value="">-- Select Crop --</option>
@@ -364,7 +350,6 @@ function PhPanel() {
           <option value="potato">Potato (ideal 5.0–6.5)</option>
         </Select>
       </Field>
-
       <Field label="Soil Type">
         <Select value={soil} onChange={setSoil}>
           <option value="sandy">Sandy / Desert (Rajasthan, Coastal)</option>
@@ -372,34 +357,15 @@ function PhPanel() {
           <option value="clay">Clay / Black Cotton (Maharashtra, MP, Gujarat)</option>
         </Select>
       </Field>
-
       <Field label="Field Area (Hectares)">
-        <input
-          type="number"
-          value={area}
-          step="0.1"
-          min="0.1"
-          placeholder="e.g. 2.5"
-          onChange={(e) => setArea(e.target.value)}
-          className={inputClass}
-        />
+        <input type="number" value={area} step="0.1" min="0.1" placeholder="e.g. 2.5" onChange={(e) => setArea(e.target.value)} className={inputClass} />
       </Field>
-
       <CalcButton onClick={calc}>⚗️ Calculate Amendment Needed</CalcButton>
-
-      <ResultBox
-        show={!!result}
-        title="Soil Amendment Required"
-        value={result?.value ?? ''}
-        detail={result?.detail ?? ''}
-      />
+      <ResultBox show={!!result} title="Soil Amendment Required" value={result?.value ?? ''} detail={result?.detail ?? ''} />
     </CardShell>
   );
 }
 
-/* ════════════════════════════════════════════════════════
-   WATER PANEL
-   ════════════════════════════════════════════════════════ */
 function WaterPanel() {
   const [crop, setCrop] = useState('rice');
   const [meth, setMeth] = useState('drip');
@@ -447,15 +413,7 @@ function WaterPanel() {
         </Select>
       </Field>
       <Field label="Field Area (Hectares)">
-        <input
-          type="number"
-          value={area}
-          step="0.1"
-          min="0.1"
-          placeholder="e.g. 1.5"
-          onChange={(e) => setArea(e.target.value)}
-          className={inputClass}
-        />
+        <input type="number" value={area} step="0.1" min="0.1" placeholder="e.g. 1.5" onChange={(e) => setArea(e.target.value)} className={inputClass} />
       </Field>
       <Field label="Season">
         <Select value={seas} onChange={setSeas}>
@@ -464,22 +422,12 @@ function WaterPanel() {
           <option value="rabi">Rabi / Winter (15% demand reduction)</option>
         </Select>
       </Field>
-
       <CalcButton onClick={calc}>💧 Calculate Water Needed</CalcButton>
-
-      <ResultBox
-        show={!!result}
-        title="Daily Irrigation Requirement"
-        value={result?.value ?? ''}
-        detail={result?.detail ?? ''}
-      />
+      <ResultBox show={!!result} title="Daily Irrigation Requirement" value={result?.value ?? ''} detail={result?.detail ?? ''} />
     </CardShell>
   );
 }
 
-/* ════════════════════════════════════════════════════════
-   SEED PANEL
-   ════════════════════════════════════════════════════════ */
 function SeedPanel() {
   const [crop, setCrop] = useState('rice_t');
   const [area, setArea] = useState('');
@@ -535,37 +483,13 @@ function SeedPanel() {
         </Select>
       </Field>
       <Field label="Field Area (Hectares)">
-        <input
-          type="number"
-          value={area}
-          step="0.1"
-          min="0.1"
-          placeholder="e.g. 3.0"
-          onChange={(e) => setArea(e.target.value)}
-          className={inputClass}
-        />
+        <input type="number" value={area} step="0.1" min="0.1" placeholder="e.g. 3.0" onChange={(e) => setArea(e.target.value)} className={inputClass} />
       </Field>
       <Field label="Seed Germination % (default 85%)">
-        <input
-          type="number"
-          value={germ}
-          step="1"
-          min="50"
-          max="100"
-          placeholder="85"
-          onChange={(e) => setGerm(e.target.value)}
-          className={inputClass}
-        />
+        <input type="number" value={germ} step="1" min="50" max="100" placeholder="85" onChange={(e) => setGerm(e.target.value)} className={inputClass} />
       </Field>
-
       <CalcButton onClick={calc}>🌱 Calculate Seeds Needed</CalcButton>
-
-      <ResultBox
-        show={!!result}
-        title="Seed Requirement"
-        value={result?.value ?? ''}
-        detail={result?.detail ?? ''}
-      />
+      <ResultBox show={!!result} title="Seed Requirement" value={result?.value ?? ''} detail={result?.detail ?? ''} />
     </CardShell>
   );
 }

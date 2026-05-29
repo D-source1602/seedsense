@@ -8,12 +8,16 @@ import {
   Coins,
   Droplet,
   Layers,
+  Sparkles,
   Sprout,
   Thermometer,
   Wheat,
 } from 'lucide-react';
 
 import Logo from '../components/Logo';
+import MeshBackground from '../components/MeshBackground';
+import Tilt3DCard from '../components/Tilt3DCard';
+import AnimatedCounter from '../components/AnimatedCounter';
 import {
   CROP_DATABASE,
   generateMarketPrice,
@@ -34,18 +38,15 @@ export default function Recommendations() {
   const [activeCrop, setActiveCrop] = useState<string | null>(null);
   const [marketPrice, setMarketPrice] = useState<number | null>(null);
 
-  // Bounce back if no location saved
   useEffect(() => {
     if (!location) navigate('/dashboard');
   }, [location, navigate]);
 
-  // Initial load (mocks the original 1.5s analysis delay)
   useEffect(() => {
     if (!location) return;
     const t = setTimeout(() => {
       setWeather(generateMockWeather(location));
       setSoil(buildSoilProfile(location.name));
-
       const cropNames = getRecommendedCrops(location.name);
       const cropList = cropNames
         .map((n) => CROP_DATABASE[n])
@@ -70,36 +71,42 @@ export default function Recommendations() {
   const currentCrop = crops.find((c) => c.name === activeCrop) ?? null;
 
   return (
-    <div className="relative min-h-screen bg-cream">
-      {/* very subtle field gradient for the page bg */}
-      <div className="pointer-events-none fixed inset-0 bg-field-radial" aria-hidden />
+    <div className="relative min-h-screen overflow-hidden bg-forest-night">
+      <MeshBackground showEmbers={false} />
 
-      <div className="relative mx-auto flex min-h-screen max-w-[1500px]">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-[1500px]">
         {/* ─────────── MAIN CONTENT ─────────── */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-10">
+        <main className="thin-scroll flex-1 overflow-y-auto p-6 md:p-10">
           <header className="flex items-center justify-between">
-            <Logo />
-            <span className="hidden md:inline pill bg-leaf-50 text-leaf-700">
+            <Logo variant="light" />
+            <span className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs font-semibold text-lime-400">
               <Sprout size={11} /> Live recommendations
             </span>
           </header>
 
-          {/* Loading placeholder */}
           {loading && (
             <div className="mx-auto mt-24 max-w-md text-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-                className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-leaf-400 to-leaf-700 text-white shadow-leaf"
-              >
-                <Sprout size={28} />
-              </motion.div>
-              <h2 className="mt-6 font-display text-2xl font-bold text-leaf-900">
+              <div className="relative mx-auto h-20 w-20">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+                  className="absolute inset-0 rounded-full border-2 border-lime-400/30 border-t-lime-400"
+                />
+                <motion.div
+                  animate={{ rotate: -360 }}
+                  transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
+                  className="absolute inset-2 rounded-full border-2 border-leaf-500/30 border-b-leaf-500"
+                />
+                <div className="absolute inset-0 grid place-items-center">
+                  <Sprout className="text-lime-400" size={24} />
+                </div>
+              </div>
+              <h2 className="mt-6 font-display text-2xl font-bold text-leaf-50">
                 Analyzing your land…
               </h2>
-              <p className="mt-1 text-sm text-leaf-700/70">
+              <p className="mt-1 text-sm text-leaf-100/60">
                 Fetching weather, soil and the best crops for{' '}
-                <span className="font-semibold text-leaf-800">
+                <span className="font-semibold text-lime-400">
                   {location.name}
                 </span>
               </p>
@@ -111,75 +118,114 @@ export default function Recommendations() {
             </div>
           )}
 
-          {/* Crop detail card */}
           {!loading && currentCrop && (
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentCrop.name}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 className="mt-8"
               >
-                {/* Hero image */}
-                <div className="relative h-[320px] overflow-hidden rounded-3xl shadow-soft md:h-[420px]">
-                  <img
-                    src={currentCrop.image}
-                    alt={currentCrop.name}
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-leaf-900/85 via-leaf-900/30 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                    <span className="pill mb-3 bg-white/15 text-white">
-                      <Wheat size={11} /> Recommended for {location.name}
-                    </span>
-                    <h1 className="font-display text-4xl font-bold text-white md:text-6xl">
-                      {currentCrop.name}
-                    </h1>
-                    <p className="mt-1 text-leaf-50/80">
-                      {currentCrop.climate} • {currentCrop.soilTypes.join(', ')}
-                    </p>
-                  </div>
-                </div>
+                {/* 3D Hero */}
+                <Tilt3DCard maxTilt={6} lift={10}>
+                  <div className="border-glow relative h-[340px] overflow-hidden rounded-3xl shadow-3d-lift md:h-[440px]">
+                    <img
+                      src={currentCrop.image}
+                      alt={currentCrop.name}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-forest-night via-forest-night/55 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-forest-night/70 via-transparent to-transparent" />
 
-                {/* Stat cards */}
+                    <div
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-lime-400 to-transparent"
+                      style={{ filter: 'blur(2px)' }}
+                    />
+
+                    <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">
+                      <motion.span
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15 }}
+                        className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-lime-400/40 bg-lime-400/15 px-3 py-1 text-xs font-semibold text-lime-400 backdrop-blur"
+                      >
+                        <Wheat size={11} /> Recommended for {location.name}
+                      </motion.span>
+                      <motion.h1
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="font-display text-5xl font-bold text-leaf-50 drop-shadow-lg md:text-7xl"
+                      >
+                        {currentCrop.name}
+                      </motion.h1>
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="mt-1 text-leaf-100/80"
+                      >
+                        {currentCrop.climate} • {currentCrop.soilTypes.join(', ')}
+                      </motion.p>
+                    </div>
+                  </div>
+                </Tilt3DCard>
+
+                {/* Stat cards (3D) */}
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  <StatCard
-                    title="Harvest Time"
-                    value={currentCrop.harvestTime}
-                    icon={<CalendarClock size={20} />}
-                    accent="leaf"
-                  />
-                  <StatCard
-                    title="Local Mandi Price"
-                    value={
-                      marketPrice
-                        ? `₹ ${marketPrice.toLocaleString('en-IN')} / Quintal`
-                        : '—'
-                    }
-                    icon={<Coins size={20} />}
-                    accent="wheat"
-                  />
+                  <Tilt3DCard maxTilt={10} lift={12}>
+                    <StatCard
+                      title="Harvest Time"
+                      value={currentCrop.harvestTime}
+                      icon={<CalendarClock size={20} />}
+                      accent="leaf"
+                    />
+                  </Tilt3DCard>
+                  <Tilt3DCard maxTilt={10} lift={12}>
+                    <StatCard
+                      title="Local Mandi Price"
+                      value={
+                        marketPrice !== null ? (
+                          <>
+                            ₹ <AnimatedCounter value={marketPrice} /> / Quintal
+                          </>
+                        ) : (
+                          '—'
+                        )
+                      }
+                      icon={<Coins size={20} />}
+                      accent="wheat"
+                    />
+                  </Tilt3DCard>
                 </div>
 
                 {/* Steps */}
-                <h2 className="section-title mt-10 flex items-center gap-2">
-                  <Layers size={18} /> Cultivation Procedure
+                <h2 className="section-title mt-12 flex items-center gap-2">
+                  <Sparkles size={18} className="text-lime-400" />
+                  Cultivation Procedure
                 </h2>
                 <ol className="mt-5 space-y-3">
                   {currentCrop.steps.map((s, i) => (
                     <motion.li
                       key={i}
-                      initial={{ opacity: 0, x: -10 }}
+                      initial={{ opacity: 0, x: -12 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.05 * i, duration: 0.3 }}
-                      className="flex items-start gap-4 rounded-2xl border border-leaf-100 bg-white p-4 shadow-soft transition-shadow hover:shadow-md"
+                      transition={{ delay: 0.05 * i, duration: 0.35 }}
+                      whileHover={{ x: 4 }}
+                      className="group relative flex items-start gap-4 overflow-hidden rounded-2xl border border-leaf-500/15 bg-moss-900/60 p-4 backdrop-blur transition-all hover:border-lime-400/40"
                     >
-                      <div className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-gradient-to-br from-leaf-400 to-leaf-700 font-bold text-white shadow-md">
+                      <span
+                        className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-lime-400 to-leaf-500 opacity-0 transition-opacity group-hover:opacity-100"
+                        aria-hidden
+                      />
+                      <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl bg-gradient-to-br from-lime-400 to-leaf-700 font-bold text-leaf-950 shadow-glow">
                         {i + 1}
                       </div>
-                      <p className="pt-1 leading-relaxed text-leaf-900/90">{s}</p>
+                      <p className="pt-1.5 leading-relaxed text-leaf-100/90">
+                        {s}
+                      </p>
                     </motion.li>
                   ))}
                 </ol>
@@ -189,20 +235,21 @@ export default function Recommendations() {
         </main>
 
         {/* ─────────── SIDEBAR ─────────── */}
-        <aside className="thin-scroll sticky top-0 hidden h-screen w-[400px] flex-shrink-0 overflow-y-auto border-l border-leaf-100 bg-white/80 p-6 backdrop-blur lg:block">
+        <aside className="thin-scroll sticky top-0 hidden h-screen w-[400px] flex-shrink-0 overflow-y-auto border-l border-leaf-500/15 bg-moss-950/60 p-6 backdrop-blur-2xl lg:block">
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-leaf-700 hover:text-leaf-900"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-lime-400 hover:text-lime-500"
           >
             <ArrowLeft size={14} /> Change Location
           </Link>
 
-          <h2 className="mt-2 font-display text-2xl font-bold text-leaf-900">
+          <h2 className="mt-2 font-display text-2xl font-bold text-leaf-50">
             Analysis for{' '}
-            <span className="text-leaf-600">{location.name}</span>
+            <span className="bg-gradient-to-r from-lime-400 to-leaf-300 bg-clip-text text-transparent">
+              {location.name}
+            </span>
           </h2>
 
-          {/* Weather card */}
           <Card title="Current Weather" icon={<CloudRain size={16} />}>
             {!weather ? (
               <Skeleton n={3} />
@@ -215,40 +262,39 @@ export default function Recommendations() {
             )}
           </Card>
 
-          {/* Soil card */}
           <Card title="Soil Profile" icon={<Layers size={16} />}>
             {!soil ? (
               <Skeleton n={2} />
             ) : (
-              <ul className="space-y-1.5 text-sm text-leaf-900/90">
-                <li>
-                  <span className="text-leaf-700/70">Primary:</span>{' '}
-                  <strong className="rounded bg-leaf-50 px-1.5 py-0.5 text-leaf-800">
+              <ul className="space-y-2 text-sm text-leaf-100/85">
+                <li className="flex justify-between">
+                  <span className="text-leaf-100/50">Primary</span>
+                  <strong className="rounded bg-lime-400/15 px-2 py-0.5 text-lime-400">
                     {soil.type}
                   </strong>
                 </li>
-                <li>
-                  <span className="text-leaf-700/70">pH Level:</span>{' '}
-                  <strong>{soil.ph}</strong>
+                <li className="flex justify-between">
+                  <span className="text-leaf-100/50">pH Level</span>
+                  <strong className="text-leaf-50">{soil.ph}</strong>
                 </li>
-                <li>
-                  <span className="text-leaf-700/70">Fertility:</span>{' '}
-                  <strong>{soil.fertility}</strong>
+                <li className="flex justify-between">
+                  <span className="text-leaf-100/50">Fertility</span>
+                  <strong className="text-leaf-50">{soil.fertility}</strong>
                 </li>
               </ul>
             )}
           </Card>
 
-          {/* Top recommendations */}
           <Card title="Top 5 Recommendations" icon={<Sprout size={16} />}>
             {crops.length === 0 ? (
               <Skeleton n={5} tall />
             ) : (
               <ul className="space-y-2">
-                {crops.map((c) => (
+                {crops.map((c, i) => (
                   <CropRow
                     key={c.name}
                     crop={c}
+                    rank={i + 1}
                     active={c.name === activeCrop}
                     onClick={() => handleSelect(c.name)}
                   />
@@ -262,7 +308,7 @@ export default function Recommendations() {
   );
 }
 
-/* ── reusable building blocks ───────────────────────────── */
+/* ── building blocks ─────────────────────────────────── */
 
 function StatCard({
   title,
@@ -271,21 +317,33 @@ function StatCard({
   accent,
 }: {
   title: string;
-  value: string;
+  value: React.ReactNode;
   icon: React.ReactNode;
   accent: 'leaf' | 'wheat';
 }) {
   const styles =
     accent === 'leaf'
-      ? 'from-leaf-500/95 to-leaf-700/95 text-white'
-      : 'from-wheat-300 to-wheat-500 text-soil-800';
+      ? {
+          gradient: 'from-leaf-700 via-leaf-800 to-moss-950',
+          glow: 'shadow-glow',
+          accent: 'text-lime-400',
+        }
+      : {
+          gradient: 'from-wheat-500 via-saffron-500 to-soil-700',
+          glow: 'shadow-glow-amber',
+          accent: 'text-wheat-200',
+        };
+
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br p-6 shadow-soft ${styles}`}>
-      <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/15 blur-2xl" />
-      <div className="relative flex items-center gap-2 text-sm font-semibold opacity-90">
+    <div
+      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br p-6 ${styles.gradient} ${styles.glow}`}
+    >
+      <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10" />
+      <div className={`relative flex items-center gap-2 text-sm font-semibold ${styles.accent}`}>
         {icon} {title}
       </div>
-      <div className="relative mt-2 font-display text-2xl font-bold md:text-3xl">
+      <div className="relative mt-2 font-display text-3xl font-bold text-white md:text-4xl">
         {value}
       </div>
     </div>
@@ -302,9 +360,9 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-5 rounded-2xl border border-leaf-100 bg-white p-4 shadow-soft">
-      <header className="mb-3 flex items-center gap-2 text-sm font-semibold text-leaf-800">
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-leaf-50 text-leaf-700">
+    <section className="mt-5 rounded-2xl border border-leaf-500/15 bg-moss-900/40 p-4 backdrop-blur">
+      <header className="mb-3 flex items-center gap-2 text-sm font-semibold text-leaf-50">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-lime-400 to-leaf-700 text-leaf-950 shadow-glow">
           {icon}
         </span>
         {title}
@@ -324,12 +382,11 @@ function Stat({
   icon?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl bg-leaf-50 p-2.5">
-      <div className="flex items-center justify-center gap-1 text-[10px] font-medium uppercase text-leaf-700/70">
-        {icon}
-        {label}
+    <div className="rounded-xl border border-leaf-500/10 bg-moss-950/60 p-2.5">
+      <div className="flex items-center justify-center gap-1 text-[10px] font-medium uppercase text-leaf-100/50">
+        {icon} {label}
       </div>
-      <div className="mt-0.5 font-display text-lg font-bold text-leaf-900">
+      <div className="mt-0.5 font-display text-lg font-bold text-leaf-50">
         {value}
       </div>
     </div>
@@ -338,10 +395,12 @@ function Stat({
 
 function CropRow({
   crop,
+  rank,
   active,
   onClick,
 }: {
   crop: Crop;
+  rank: number;
   active: boolean;
   onClick: () => void;
 }) {
@@ -351,24 +410,31 @@ function CropRow({
         onClick={onClick}
         whileTap={{ scale: 0.98 }}
         whileHover={{ x: 4 }}
-        className={`flex w-full items-center gap-3 rounded-xl p-2 text-left transition-all ${
+        className={`group relative flex w-full items-center gap-3 overflow-hidden rounded-xl p-2 text-left transition-all ${
           active
-            ? 'bg-gradient-to-r from-leaf-500 to-leaf-700 text-white shadow-leaf'
-            : 'bg-white hover:bg-leaf-50'
-        } border ${active ? 'border-transparent' : 'border-leaf-100'}`}
+            ? 'bg-gradient-to-r from-lime-400 to-leaf-500 text-leaf-950 shadow-glow'
+            : 'bg-moss-950/60 hover:bg-moss-800/60 border border-leaf-500/15'
+        }`}
       >
+        <span
+          className={`grid h-5 w-5 flex-shrink-0 place-items-center rounded-full text-[10px] font-bold ${
+            active ? 'bg-leaf-950 text-lime-400' : 'bg-lime-400/15 text-lime-400'
+          }`}
+        >
+          {rank}
+        </span>
         <img
           src={crop.image}
           alt={crop.name}
-          className="h-12 w-12 flex-shrink-0 rounded-lg object-cover ring-1 ring-white/40"
+          className="h-12 w-12 flex-shrink-0 rounded-lg object-cover ring-1 ring-white/15"
         />
         <div className="flex-1">
-          <div className={`font-semibold ${active ? '' : 'text-leaf-900'}`}>
+          <div className={`font-semibold ${active ? '' : 'text-leaf-50'}`}>
             {crop.name}
           </div>
           <div
             className={`text-[11px] ${
-              active ? 'text-white/80' : 'text-leaf-700/60'
+              active ? 'text-leaf-950/70' : 'text-leaf-100/50'
             }`}
           >
             {crop.harvestTime}

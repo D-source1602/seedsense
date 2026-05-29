@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, Crosshair, Map as MapIcon, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowRight,
+  Crosshair,
+  Globe2,
+  Leaf,
+  Map as MapIcon,
+  Search,
+  Sparkles,
+} from 'lucide-react';
 
 import Logo from '../components/Logo';
 import MapView from '../components/MapView';
 import ClimateRiskPanel from '../components/ClimateRiskPanel';
+import MagneticButton from '../components/MagneticButton';
 import { INDIAN_STATES } from '../data/states';
 import { useSelectedLocation } from '../hooks/useSelectedLocation';
 import type { LocationSelection } from '../types';
@@ -52,27 +61,44 @@ export default function Dashboard() {
 
   function confirm() {
     if (!location) return;
-    // sessionStorage already written by the hook; navigate
     navigate('/recommendations');
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-cream">
+    <div className="flex h-screen w-full overflow-hidden bg-forest-night">
       {/* ────────── SIDEBAR ────────── */}
-      <aside className="relative z-20 flex w-[360px] flex-shrink-0 flex-col overflow-hidden bg-gradient-to-b from-leaf-700 via-leaf-800 to-leaf-900 text-white shadow-2xl">
-        {/* swaying glow */}
-        <div className="pointer-events-none absolute -left-10 top-20 h-72 w-72 rounded-full bg-leaf-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-10 bottom-20 h-60 w-60 rounded-full bg-wheat-300/15 blur-3xl" />
+      <aside className="relative z-20 flex w-[380px] flex-shrink-0 flex-col overflow-hidden bg-gradient-to-b from-moss-900 via-leaf-950 to-forest-night text-leaf-50 shadow-3d-lift">
+        {/* mesh glows */}
+        <div className="pointer-events-none absolute -left-20 top-32 h-72 w-72 rounded-full bg-leaf-500/25 blur-3xl animate-orbDrift" />
+        <div className="pointer-events-none absolute -right-16 bottom-40 h-64 w-64 rounded-full bg-saffron-500/15 blur-3xl animate-orbDrift" />
+        <div className="pointer-events-none absolute right-1/3 top-1/2 h-48 w-48 rounded-full bg-lime-400/15 blur-3xl" />
+
+        {/* film grain */}
+        <div className="noise" />
 
         {/* header */}
         <div className="relative z-10 px-6 pt-6">
           <Logo variant="light" />
-          <div className="mt-5">
-            <h1 className="font-display text-2xl font-bold">Climate Explorer</h1>
-            <p className="text-sm text-leaf-100/70">
-              Pick your land and discover what to grow.
+
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mt-6"
+          >
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-lime-400">
+              <Sparkles size={10} /> Climate Explorer
+            </div>
+            <h1 className="font-display text-3xl font-bold leading-tight">
+              Pick your{' '}
+              <span className="bg-gradient-to-r from-lime-400 to-leaf-300 bg-clip-text text-transparent">
+                land.
+              </span>
+            </h1>
+            <p className="mt-1 text-sm text-leaf-100/60">
+              Discover what to grow with AI-driven climate insights.
             </p>
-          </div>
+          </motion.div>
         </div>
 
         {/* geolocate button */}
@@ -81,28 +107,44 @@ export default function Dashboard() {
             onClick={getMyLocation}
             disabled={geoLoading}
             whileTap={{ scale: 0.97 }}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/15 disabled:opacity-60"
+            whileHover={{ scale: 1.02 }}
+            className="pulse-glow relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl border border-lime-400/30 bg-gradient-to-br from-leaf-500/20 via-leaf-700/10 to-moss-900 px-4 py-3 text-sm font-semibold text-lime-400 backdrop-blur transition disabled:opacity-60"
           >
-            <Crosshair size={16} />
-            {geoLoading ? 'Locating…' : 'Get My Current Location'}
+            <span
+              className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-lime-400/15 to-transparent"
+              style={{
+                animation: geoLoading ? 'none' : 'shimmer 2.4s linear infinite',
+              }}
+            />
+            <Crosshair size={16} className={geoLoading ? 'animate-spin' : ''} />
+            {geoLoading ? 'Locating you…' : 'Use My Current Location'}
           </motion.button>
-          {geoError && (
-            <p className="mt-2 text-xs text-rose-200">{geoError}</p>
-          )}
+          <AnimatePresence>
+            {geoError && (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-2 rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-200"
+              >
+                {geoError}
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* search */}
         <div className="relative z-10 mt-5 px-6">
-          <div className="relative">
+          <div className="group relative">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-leaf-100/60"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-leaf-100/40 transition group-focus-within:text-lime-400"
             />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search states & UTs"
-              className="w-full rounded-xl border border-white/20 bg-white/10 py-2.5 pl-9 pr-3 text-sm text-white placeholder-leaf-100/50 backdrop-blur focus:border-wheat-300 focus:outline-none focus:ring-2 focus:ring-wheat-300/40"
+              placeholder="Search states & UTs…"
+              className="w-full rounded-xl border border-leaf-500/20 bg-moss-950/60 py-2.5 pl-9 pr-3 text-sm text-leaf-50 placeholder-leaf-100/30 backdrop-blur focus:border-lime-400/60 focus:outline-none focus:ring-2 focus:ring-lime-400/40"
             />
           </div>
         </div>
@@ -110,61 +152,115 @@ export default function Dashboard() {
         {/* state list */}
         <div className="relative z-10 mt-3 flex-1 overflow-hidden px-6">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-leaf-100/70">
-              Indian States &amp; UTs
+            <h2 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-leaf-100/50">
+              <Globe2 size={11} /> Indian States &amp; UTs
             </h2>
-            <span className="text-xs text-leaf-100/50">{filtered.length}</span>
+            <span className="rounded-full bg-leaf-500/10 px-2 py-0.5 text-[10px] font-semibold text-lime-400">
+              {filtered.length}
+            </span>
           </div>
-          <ul className="thin-scroll h-full overflow-y-auto pb-32 pr-1">
-            {filtered.map((s) => (
-              <StateRow
-                key={s.name}
-                name={s.name}
-                active={location?.name === s.name}
-                onClick={() => pickState(s)}
-              />
-            ))}
+          <ul className="thin-scroll h-full overflow-y-auto pb-32 pr-1 space-y-1">
+            <AnimatePresence>
+              {filtered.map((s, i) => (
+                <StateRow
+                  key={s.name}
+                  index={i}
+                  name={s.name}
+                  active={location?.name === s.name}
+                  onClick={() => pickState(s)}
+                />
+              ))}
+            </AnimatePresence>
             {filtered.length === 0 && (
-              <li className="rounded-lg bg-white/5 px-3 py-4 text-center text-sm text-leaf-100/60">
-                No matches — try another search
+              <li className="rounded-lg border border-leaf-500/10 bg-moss-950/40 px-3 py-6 text-center text-sm text-leaf-100/50">
+                No matches — try another search 🔎
               </li>
             )}
           </ul>
         </div>
 
         {/* confirm */}
-        <div className="relative z-10 border-t border-white/10 bg-leaf-900/40 px-6 py-4 backdrop-blur">
-          <motion.button
-            whileTap={{ scale: 0.97 }}
+        <div className="relative z-10 border-t border-leaf-500/15 bg-moss-950/60 px-6 py-4 backdrop-blur">
+          <MagneticButton
             disabled={!location}
             onClick={confirm}
-            className="btn-wheat w-full"
+            className="btn-wheat group w-full"
+            strength={0.25}
           >
             Confirm &amp; Continue
-            <ArrowRight size={18} />
-          </motion.button>
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-soil-800 text-wheat-300 transition-transform group-hover:translate-x-0.5">
+              <ArrowRight size={16} />
+            </span>
+          </MagneticButton>
           {location && (
-            <p className="mt-2 text-center text-xs text-leaf-100/70">
+            <motion.p
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 text-center text-xs text-leaf-100/60"
+            >
               Selected:{' '}
               <span className="font-semibold text-wheat-300">{location.name}</span>
-            </p>
+            </motion.p>
           )}
         </div>
       </aside>
 
       {/* ────────── MAP AREA ────────── */}
-      <section className="relative flex-1">
-        {/* Empty-state overlay */}
-        {!location && (
+      <section className="relative flex-1 bg-forest-night">
+        {/* Top bar */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[400] flex items-center justify-between gap-4 px-6 pt-4">
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="pointer-events-none absolute right-6 top-6 z-[400] flex items-center gap-2 rounded-full border border-leaf-100 bg-white/85 px-4 py-2 text-sm text-leaf-800 shadow-soft backdrop-blur"
+            className="pointer-events-auto flex items-center gap-2 rounded-full border border-leaf-500/20 bg-moss-900/70 px-4 py-2 text-sm text-leaf-100 backdrop-blur-xl"
           >
-            <MapIcon size={14} />
-            Pick a state on the left or use your current location
+            <MapIcon size={14} className="text-lime-400" />
+            <span className="font-semibold">India</span>
+            <span className="text-leaf-100/40">/</span>
+            <span className="text-leaf-100/70">
+              {location ? location.name : 'Pick a state to begin'}
+            </span>
           </motion.div>
-        )}
+
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-lime-400/30 bg-moss-900/70 px-3 py-1.5 text-xs text-lime-400 backdrop-blur-xl"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-lime-400" />
+            </span>
+            Live climate data
+          </motion.div>
+        </div>
+
+        {/* Empty-state center hint */}
+        <AnimatePresence>
+          {!location && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              transition={{ duration: 0.5 }}
+              className="pointer-events-none absolute inset-0 z-[400] grid place-items-center"
+            >
+              <div className="glass-card-strong px-6 py-5 text-center">
+                <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-lime-400 to-leaf-700 text-leaf-950 shadow-glow">
+                  <Leaf size={20} />
+                </div>
+                <p className="mt-3 font-display text-lg font-bold text-leaf-50">
+                  Let's grow something{' '}
+                  <span className="text-lime-400">amazing.</span>
+                </p>
+                <p className="mt-1 text-xs text-leaf-100/60">
+                  Pick a state on the left or use your current location
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <MapView
           selection={location as LocationSelection | null}
@@ -178,36 +274,50 @@ export default function Dashboard() {
   );
 }
 
-/* ── single sidebar row ─────────────────────────────────────── */
+/* ── single sidebar state row ─────────────────────────── */
 function StateRow({
   name,
   active,
+  index,
   onClick,
 }: {
   name: string;
   active: boolean;
+  index: number;
   onClick: () => void;
 }) {
   return (
-    <li>
-      <button
+    <motion.li
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: Math.min(index * 0.012, 0.4), duration: 0.3 }}
+    >
+      <motion.button
         onClick={onClick}
-        className={`group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-all ${
+        whileHover={{ x: 4 }}
+        whileTap={{ scale: 0.98 }}
+        className={`group relative flex w-full items-center justify-between overflow-hidden rounded-xl px-3 py-2.5 text-left text-sm transition-all ${
           active
-            ? 'bg-wheat-300 text-leaf-900 font-semibold shadow-md'
-            : 'text-leaf-50 hover:bg-white/10'
+            ? 'bg-gradient-to-r from-lime-400 to-leaf-500 text-leaf-950 font-semibold shadow-glow'
+            : 'text-leaf-100/85 hover:bg-moss-800/60 hover:text-leaf-50'
         }`}
       >
-        <span>{name}</span>
+        {!active && (
+          <span
+            className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-lime-400 to-leaf-500 opacity-0 transition-opacity group-hover:opacity-100"
+            aria-hidden
+          />
+        )}
+        <span className="relative">{name}</span>
         <ArrowRight
           size={14}
-          className={`transition-all ${
+          className={`relative transition-all ${
             active
               ? 'translate-x-0 opacity-100'
               : '-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-60'
           }`}
         />
-      </button>
-    </li>
+      </motion.button>
+    </motion.li>
   );
 }

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
 
 const LANGUAGES = [
-  { code: 'en', label: '🇮🇳 English' },
+  { code: 'en', label: 'English' },
   { code: 'hi', label: 'हिंदी' },
   { code: 'mr', label: 'मराठी' },
   { code: 'or', label: 'ଓଡ଼ିଆ' },
@@ -33,15 +33,10 @@ function applyTranslation(code: string) {
   location.reload();
 }
 
-/**
- * Multilingual top bar (English + 8 Indian languages) using Google Translate.
- * The bar pushes the page down 50px (handled by global CSS spacer).
- */
 export default function LanguageBar() {
   const [active, setActive] = useState(getCurrentLang());
 
   useEffect(() => {
-    // ensure GT script is loaded once
     if (document.getElementById('gtl-script')) return;
 
     window.googleTranslateElementInit = () => {
@@ -58,12 +53,10 @@ export default function LanguageBar() {
 
     const s = document.createElement('script');
     s.id = 'gtl-script';
-    s.src =
-      'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
     s.async = true;
     document.head.appendChild(s);
 
-    // hidden GT mount node
     if (!document.getElementById('gtl-element')) {
       const el = document.createElement('div');
       el.id = 'gtl-element';
@@ -77,29 +70,35 @@ export default function LanguageBar() {
       initial={{ y: -32, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-x-0 top-0 z-[99999] flex flex-wrap items-center justify-center gap-2 bg-gradient-to-r from-saffron-500 via-saffron-400 to-wheat-300 px-4 py-2 shadow-md"
-      style={{ minHeight: '42px' }}
+      className="fixed inset-x-0 top-0 z-[99999] flex flex-wrap items-center justify-center gap-2 border-b border-lime-400/20 px-4 py-2 backdrop-blur-xl"
+      style={{
+        minHeight: '42px',
+        background:
+          'linear-gradient(90deg, rgba(13, 29, 18, 0.95) 0%, rgba(20, 50, 30, 0.95) 50%, rgba(13, 29, 18, 0.95) 100%)',
+      }}
     >
-      <span className="flex items-center gap-1.5 text-sm font-bold text-white">
-        <Globe size={14} /> भाषा / Language:
+      <span className="flex items-center gap-1.5 text-sm font-bold text-lime-400">
+        <Globe size={14} /> Language:
       </span>
       {LANGUAGES.map((l) => {
         const isActive = active === l.code;
         return (
-          <button
+          <motion.button
             key={l.code}
             onClick={() => {
               setActive(l.code);
               applyTranslation(l.code);
             }}
-            className={`whitespace-nowrap rounded-full border-2 px-3 py-1 text-[12px] font-semibold transition-all ${
+            whileHover={{ scale: 1.06, y: -1 }}
+            whileTap={{ scale: 0.96 }}
+            className={`whitespace-nowrap rounded-full border px-3 py-1 text-[12px] font-semibold transition-all ${
               isActive
-                ? 'border-white bg-white text-saffron-600 shadow-sm'
-                : 'border-white/50 bg-white/15 text-white backdrop-blur hover:border-white hover:bg-white/30'
+                ? 'border-lime-400 bg-gradient-to-r from-lime-400 to-leaf-500 text-leaf-950 shadow-glow'
+                : 'border-leaf-500/30 bg-moss-900/60 text-leaf-100/80 backdrop-blur hover:border-lime-400/60 hover:text-lime-400'
             }`}
           >
             {l.label}
-          </button>
+          </motion.button>
         );
       })}
     </motion.div>
