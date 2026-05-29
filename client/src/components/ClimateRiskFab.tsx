@@ -158,7 +158,6 @@ export default function ClimateRiskFab() {
                     <Lightbulb size={14} className="mt-0.5 shrink-0 text-amber-400" />
                     <p className="text-[12px] leading-snug text-leaf-100/85">{data.advice}</p>
                   </div>
-                </div>
               </LiquidGlass>
             </Tilt3DCard>
             </motion.div>
