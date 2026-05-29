@@ -12,6 +12,7 @@ import {
 
 import { computeRisk, STATE_RISK } from '../data/climateRisk';
 import AnimatedCounter from './AnimatedCounter';
+import LiquidGlass from './LiquidGlass';
 import Tilt3DCard from './Tilt3DCard';
 import type { RiskLevel } from '../types';
 
@@ -65,7 +66,7 @@ export default function ClimateRiskFab() {
               className="perspective-1500"
             >
               <Tilt3DCard maxTilt={5} lift={4} className="w-[360px] max-w-[94vw]">
-                <div className="border-glow glass-card-strong relative p-6">
+                <LiquidGlass rim className="border-glow relative rounded-2xl p-6">
                   <button
                     onClick={() => setOpen(false)}
                     className="absolute right-4 top-4 grid h-7 w-7 place-items-center rounded-full bg-moss-800/80 text-leaf-100 transition hover:bg-moss-700"
@@ -158,7 +159,8 @@ export default function ClimateRiskFab() {
                     <p className="text-[12px] leading-snug text-leaf-100/85">{data.advice}</p>
                   </div>
                 </div>
-              </Tilt3DCard>
+              </LiquidGlass>
+            </Tilt3DCard>
             </motion.div>
           </motion.div>
         )}

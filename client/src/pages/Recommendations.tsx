@@ -360,14 +360,14 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-5 rounded-2xl border border-leaf-500/15 bg-moss-900/40 p-4 backdrop-blur">
-      <header className="mb-3 flex items-center gap-2 text-sm font-semibold text-leaf-50">
+    <section className="liquid-glass-soft mt-5 overflow-hidden rounded-2xl">
+      <header className="flex items-center gap-2 border-b border-white/8 px-4 py-3 text-sm font-semibold text-leaf-50">
         <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-lime-400 to-leaf-700 text-leaf-950 shadow-glow">
           {icon}
         </span>
         {title}
       </header>
-      {children}
+      <div className="px-4 py-4">{children}</div>
     </section>
   );
 }

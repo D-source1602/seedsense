@@ -12,6 +12,7 @@ import {
 
 import { computeRisk } from '../data/climateRisk';
 import AnimatedCounter from './AnimatedCounter';
+import LiquidGlass from './LiquidGlass';
 import Tilt3DCard from './Tilt3DCard';
 import type { RiskLevel } from '../types';
 
@@ -52,7 +53,7 @@ export default function ClimateRiskPanel({ stateName }: Props) {
         className="pointer-events-auto absolute bottom-6 left-6 z-[1000] w-[400px] max-w-[calc(100vw-3rem)] perspective-1500"
       >
         <Tilt3DCard maxTilt={6} lift={6}>
-          <div className="border-glow glass-card-strong relative overflow-hidden p-5">
+          <LiquidGlass rim className="border-glow relative overflow-hidden rounded-2xl p-5">
             {/* scanline */}
             <div
               className="pointer-events-none absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-lime-400/60 to-transparent"
@@ -151,7 +152,7 @@ export default function ClimateRiskPanel({ stateName }: Props) {
                 </motion.div>
               </>
             )}
-          </div>
+          </LiquidGlass>
         </Tilt3DCard>
       </motion.div>
     </AnimatePresence>
